@@ -1,42 +1,24 @@
-# mongoose-express-middleware
-Express CRUD middleware for mongoose
+# mongoose-crud
+Express CRUD middleware for mongoose model
 
-[![Build Status](https://travis-ci.org/jerrymannel/mongoose-express-middleware.svg?branch=master)](https://travis-ci.org/jerrymannel/mongoose-express-middleware)
-[![Known Vulnerabilities](https://snyk.io/test/github/jerrymannel/mongoose-express-middleware/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jerrymannel/mongoose-express-middleware?targetFile=package.json)
 
 # Quickstart
 
 Install 
 
 ```sh
-npm install mongoose-express-middleware
+npm install mongoose-crud
 ```
 
-Define your schema and create a new mongoose-express-middleware
+Use your mongoose model and create a new mongoose-crud
 
 ```js
-var definition = {
-	"_id": { "type": String },
-	"name": { "type": String },
-	"description": { "type": String },
-	"age" : {"type" : Number}
-}
+const mongoose = require('mongoose');
+const MongooseCRUD = require('mongoose-crud');
 
-var schema = Mongoose.Schema(definition)
-var modelName = "foobar"
-var options = {
-	collectionName: "foobar",
-	defaultFilter: {
-		"age": {"$gte": 10}
-	}
-}
+const model = mongoose.model('modelName',schema);
 
-schema.pre("save", function(next){
-	if(!this._id) this._id = new Mongoose.Types.ObjectId();
-	next()
-})
-
-var fooCrud = new MongooseExpressMiddleware(modelName, schema, options)
+var crud = new MongooseCRUD(model);
 ```
 
 Add the middleware to express
@@ -45,14 +27,14 @@ Add the middleware to express
 var app = express()
 app.use(express.json())
 
-app.post("/foo", fooCrud.create)
-app.get("/foo", fooCrud.index)
-app.get("/foo/bulkShow", fooCrud.bulkShow)
-app.put("/foo/bulkUpdate", fooCrud.bulkUpdate)
-app.delete("/foo/bulkDelete", fooCrud.bulkDestroy)
-app.get("/foo/:id", fooCrud.show)
-app.put("/foo/:id", fooCrud.update)
-app.delete("/foo/:id", fooCrud.destroy)
+app.post("/foo", crud.create)
+app.get("/foo", crud.index)
+app.get("/foo/bulkShow", crud.bulkShow)
+app.put("/foo/bulkUpdate", crud.bulkUpdate)
+app.delete("/foo/bulkDelete", crud.bulkDestroy)
+app.get("/foo/:id", crud.show)
+app.put("/foo/:id", crud.update)
+app.delete("/foo/:id", crud.destroy)
 
 app.listen(8080)
 ```
@@ -62,26 +44,24 @@ app.listen(8080)
 1. [Quickstart](#Quickstart)
 2. [Constructor](#Constructor)
 3. [Methods](#Methods)
-	* [create(`req`, `res`)](#MongooseExpressMiddleware.create(`req`,-`res`))
-	* [update(`req`, `res`)](#MongooseExpressMiddleware.update(`req`,-`res`))
-	* [index(`req`, `res`)](#MongooseExpressMiddleware.index(`req`,-`res`))
-	* [show(`req`, `res`)](#MongooseExpressMiddleware.show(`req`,-`res`))
-	* [destroy(`req`, `res`)](#MongooseExpressMiddleware.destroy(`req`,-`res`))
-	* [bulkShow(`req`, `res`)](#MongooseExpressMiddleware.bulkShow(`req`,-`res`))
-	* [bulkUpdate(`req`, `res`)](#MongooseExpressMiddleware.bulkUpdate(`req`,-`res`))
-	* [bulkDestroy(`req`, `res`)](#MongooseExpressMiddleware.bulkDestroy(`req`,-`res`))
+	* [create(`req`, `res`)](#MongooseCRUD.create(`req`,-`res`))
+	* [update(`req`, `res`)](#MongooseCRUD.update(`req`,-`res`))
+	* [index(`req`, `res`)](#MongooseCRUD.index(`req`,-`res`))
+	* [show(`req`, `res`)](#MongooseCRUD.show(`req`,-`res`))
+	* [destroy(`req`, `res`)](#MongooseCRUD.destroy(`req`,-`res`))
+	* [bulkShow(`req`, `res`)](#MongooseCRUD.bulkShow(`req`,-`res`))
+	* [bulkUpdate(`req`, `res`)](#MongooseCRUD.bulkUpdate(`req`,-`res`))
+	* [bulkDestroy(`req`, `res`)](#MongooseCRUD.bulkDestroy(`req`,-`res`))
 
 
 # Constructor
 
-`var fooCrud = new MongooseExpressMiddleware(modelName, schema, options)`
+`var fooCrud = new MongooseCRUD(model)`
 
-The constructor takes 3 values, 
+The constructor takes 2 params, 
 
-* **modelName**(_Required_): Name of the mongoose model.
-* **schema**(_Required_): The schema object returned by `Mongoose.Schema()`
+* **model**(_Required_): The mongoose model.
 * **options*(_Optional_): An optional options object. This has two properties.
-	* _collectionName_: [By default Mongoose uses the pluralised model name as the collection name](https://mongoosejs.com/docs/guide.html#collection). If you wish to override this, then provide your custom collection name here.
 	* _defaultFilter_: A default filter to be applied to all `GET` calls.
 	* _logger_: A logger object. By default this will use [log4js](https://www.npmjs.com/package/log4js)
 
@@ -89,7 +69,7 @@ The constructor takes 3 values,
 
 > All methods in two parameters. An express request object and an express response object
 
-## MongooseExpressMiddleware.create(`req`, `res`)
+## MongooseCRUD.create(`req`, `res`)
 
 Create a new document using the data in `req.body`.
 
@@ -104,13 +84,13 @@ E.g. `app.post("/foo", fooCrud.create)`
 | Array of JSON | Array of JSON | `400 Bad Request` | All documents in the array had errors.
 
 
-## MongooseExpressMiddleware.update(`req`, `res`)
+## MongooseCRUD.update(`req`, `res`)
 
 Update a single document where the `:id` matches the `_id` of the document
 
 E.g. `app.put("/foo/:id", fooCrud.update)`
 
-## MongooseExpressMiddleware.index(`req`, `res`)
+## MongooseCRUD.index(`req`, `res`)
 
 Displays the documents in the collection. URL parameters are used to influence the output generated.
 
@@ -120,7 +100,7 @@ The following are URL params are available.
 
 | Param | Type | Description |
 |--|--|--|
-| `filter` | JSON | Filter condition for the documents. This filter gets merged with _defaultFilter_ if one was defined when the MongooseExpressMiddleware object was instantiated.
+| `filter` | JSON | Filter condition for the documents. This filter gets merged with _defaultFilter_ if one was defined when the MongooseCRUD object was instantiated.
 | `count` | Boolean | Returns the count of the documents after applying the filter. When `count` is enabled only `filter` paramerter takes effect.
 | `page` | Number | Specify the page number of the paginated data. Default _1_.
 | `limit` | Number | Specify the number for documents per page. Default _10_.
@@ -128,7 +108,7 @@ The following are URL params are available.
 | `sort` | String | The attributes on which the results have to be sorted. By default, the documents are sorted in ascending order. If the attribute is preceded by a "-", then the sorting is done in descending order.
 
 
-## MongooseExpressMiddleware.show(`req`, `res`)
+## MongooseCRUD.show(`req`, `res`)
 
 Display a single document where the `:id` matches the `_id` of the document.
 
@@ -138,7 +118,7 @@ E.g. `app.get("/foo/:id", fooCrud.show)`
 |--|--|--|
 | `select` | String | List of comma-separated attributes of the document to display. If the attribute is preceded by a "-", then the attribute is omitted.
 
-## MongooseExpressMiddleware.destroy(`req`, `res`)
+## MongooseCRUD.destroy(`req`, `res`)
 
 Deletes a single document where the `:id` matches the `_id` of the document.
 
@@ -146,9 +126,9 @@ E.g. `app.delete("/foo/:id", fooCrud.destroy)`
 
 If the document is found and deleted, then `200 OK` is returned. If no document gets deleted, then `204 No Content` is returned.
 
-## MongooseExpressMiddleware.bulkShow(`req`, `res`)
+## MongooseCRUD.bulkShow(`req`, `res`)
 
-Display multiple documents for the given set of _ids. This is a convenience function over `MongooseExpressMiddleware.index()` with `filter`.
+Display multiple documents for the given set of _ids. This is a convenience function over `MongooseCRUD.index()` with `filter`.
 
 E.g. `app.get("/foo/bulkShow", fooCrud.bulkShow)`
 
@@ -158,7 +138,7 @@ E.g. `app.get("/foo/bulkShow", fooCrud.bulkShow)`
 | `select` | String | List of comma-separated attributes of the document to display. If the attribute is preceded by a "-", then the attribute is omitted.
 | `sort` | String | The attributes on which the results have to be sorted. By default, the documents are sorted in ascending order. If the attribute is preceded by a "-", then the sorting is done in descending order.
 
-## MongooseExpressMiddleware.bulkUpdate(`req`, `res`)
+## MongooseCRUD.bulkUpdate(`req`, `res`)
 
 Update multiple documents in a single request. The request has to be an array, with each document having an `_id`. 
 
@@ -166,7 +146,7 @@ E.g. `app.put("/foo/bulkUpdate", fooCrud.bulkUpdate)`
 
 The response is an array of updated documents in the same order of input request. If an `_id` can't be located, then the response would be `null` for that document
 
-## MongooseExpressMiddleware.bulkDestroy(`req`, `res`)
+## MongooseCRUD.bulkDestroy(`req`, `res`)
 
 Delete multiple documents for the given set of _ids. 
 

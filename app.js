@@ -1,20 +1,17 @@
-"use strict"
-const mongoose = require("mongoose")
-const log4js = require("log4js")
-const Middleware = require("./Middleware")
+'use strict'
+const log4js = require('log4js')
+const Middleware = require('./Middleware')
 
 function initLogger() {
-	let version = require("./package.json").version
+	let version = require('./package.json').version
 	let logger = log4js.getLogger(`[mongoose-express-middleware ${version}]`)
-	logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info"
+	logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info'
 	return logger
 }
 
-function MongooseModel(_model, _schema, _options) {
-	this.schema = _schema
-	let collectionName = _options && _options.collectionName ? _options.collectionName : null
+function MongooseModel(_model, _options) {
 	let defaultFilter = _options && _options.defaultFilter ? _options.defaultFilter : {}
-	this.model = mongoose.model(_model, this.schema, collectionName)
+	this.model = _model
 	let logger = _options && _options.logger ? _options.logger : initLogger()
 
 	Middleware.call(this, this.model, logger, defaultFilter)
@@ -31,8 +28,7 @@ function MongooseModel(_model, _schema, _options) {
 
 MongooseModel.prototype = {
 	constructor: MongooseModel,
-	model: null,
-	schema: null
+	model: null
 }
 
 MongooseModel.prototype = Object.assign(Middleware.prototype, MongooseModel.prototype)

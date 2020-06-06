@@ -1,27 +1,26 @@
 {
-    "name": "mongoose-express-middleware",
+    "name": "mongoose-crud",
     "version": "1.1.0",
-    "description": "mongoose-express-middleware middleware for Express",
+    "description": "mongoose-crud middleware for Express",
     "main": "app.js",
     "scripts": {
         "test": "./node_modules/.bin/mocha test",
         "ft": "./node_modules/.bin/mocha functionalTest/test.js",
-        "lint": "./node_modules/.bin/eslint app.js lib.js --fix"
+        "lint": "./node_modules/.bin/eslint app.js Middleware.js --fix"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/jerrymannel/mongoose-express-middleware.git"
+        "url": "git+https://github.com/jugnu-appveen/mongoose-crud.git"
     },
     "author": "",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/jerrymannel/mongoose-express-middleware/issues"
+        "url": "https://github.com/jugnu-appveen/mongoose-crud/issues"
     },
-    "homepage": "https://github.com/jerrymannel/mongoose-express-middleware#readme",
+    "homepage": "https://github.com/jugnu-appveen/mongoose-crud#readme",
     "dependencies": {
         "lodash": "^4.17.15",
-        "log4js": "^6.1.0",
-        "mongoose": "^5.8.7"
+        "log4js": "^6.1.0"
     },
     "devDependencies": {
         "chai": "^4.2.0",
